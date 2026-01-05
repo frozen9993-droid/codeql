@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.ir.types.IrStarProjection
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.IrTypeArgument
 import org.jetbrains.kotlin.ir.types.IrTypeProjection
-import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
 import org.jetbrains.kotlin.ir.types.impl.IrStarProjectionImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.*
@@ -61,7 +60,7 @@ private fun IrSimpleType.substituteTypeArguments(
             }
         }
 
-    return IrSimpleTypeImpl(classifier, isNullableCodeQL(), newArguments, annotations)
+    return codeqlIrSimpleTypeImpl(classifier, isNullableCodeQL(), newArguments, annotations)
 }
 
 /**

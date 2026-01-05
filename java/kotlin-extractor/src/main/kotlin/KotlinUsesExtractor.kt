@@ -725,7 +725,7 @@ open class KotlinUsesExtractor(
                     componentType.isNullableCodeQL()
             if (unchanged) arrayType
             else
-                IrSimpleTypeImpl(
+                codeqlIrSimpleTypeImpl(
                     arrayType.classifier,
                     true,
                     listOf(makeTypeProjection(componentTypeBroadened, Variance.INVARIANT)),
