@@ -1722,7 +1722,7 @@ private class SummaryPostUpdateNode extends FlowSummaryNode, PostUpdateNodeImpl 
  * `CallGraphConstruction::Make` in stead of
  * `CallGraphConstruction::Simple::Make` appropriately.
  */
-class CapturedVariablesArgumentNode extends CfgNode, ArgumentNode {
+class CapturedVariablesArgumentNode extends CfgNode {
   CallNode callNode;
 
   CapturedVariablesArgumentNode() {
@@ -1733,7 +1733,11 @@ class CapturedVariablesArgumentNode extends CfgNode, ArgumentNode {
   }
 
   override string toString() { result = "Capturing closure argument" }
+}
 
+class CapturedVariablesArgumentNodeAsArgumentNode extends CapturedVariablesArgumentNode,
+  ArgumentNode
+{
   override predicate argumentOf(DataFlowCall call, ArgumentPosition pos) {
     callNode = call.getNode() and
     pos.isLambdaSelf()
@@ -1741,9 +1745,7 @@ class CapturedVariablesArgumentNode extends CfgNode, ArgumentNode {
 }
 
 /** A synthetic node representing the values of variables captured by a comprehension. */
-class SynthCompCapturedVariablesArgumentNode extends Node, TSynthCompCapturedVariablesArgumentNode,
-  ArgumentNode
-{
+class SynthCompCapturedVariablesArgumentNode extends Node, TSynthCompCapturedVariablesArgumentNode {
   Comp comp;
 
   SynthCompCapturedVariablesArgumentNode() { this = TSynthCompCapturedVariablesArgumentNode(comp) }
@@ -1755,7 +1757,11 @@ class SynthCompCapturedVariablesArgumentNode extends Node, TSynthCompCapturedVar
   override Location getLocation() { result = comp.getLocation() }
 
   Comp getComprehension() { result = comp }
+}
 
+class SynthCompCapturedVariablesArgumentNodeAsArgumentNode extends SynthCompCapturedVariablesArgumentNode,
+  ArgumentNode
+{
   override predicate argumentOf(DataFlowCall call, ArgumentPosition pos) {
     call.(ComprehensionCall).getComprehension() = comp and
     pos.isLambdaSelf()
