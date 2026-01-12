@@ -1714,34 +1714,50 @@ private class SummaryPostUpdateNode extends FlowSummaryNode, PostUpdateNodeImpl 
  * This is also known as the environment part of a closure.
  *
  * This is used for tracking flow through captured variables.
- *
- * TODO:
- * We might want a synthetic node here, but currently that incurs problems
- * with non-monotonic recursion, because of the use of `resolveCall` in the
- * char pred. This may be solvable by using
- * `CallGraphConstruction::Make` in stead of
- * `CallGraphConstruction::Simple::Make` appropriately.
  */
-class CapturedVariablesArgumentNode extends CfgNode {
+class CapturedVariablesArgumentNode extends Node, TSynthCapturedVariablesArgumentNode {
   CallNode callNode;
 
   CapturedVariablesArgumentNode() {
-    node = callNode.getFunction() and
-    exists(Function target | resolveCall(callNode, target, _) |
-      target = any(VariableCapture::CapturedVariable v).getACapturingScope()
+    exists(ControlFlowNode callable |
+      this = TSynthCapturedVariablesArgumentNode(callable) and callable = callNode.getFunction()
     )
   }
+
+  /** Gets the call node associated with this captured variables argument. */
+  CallNode getCallNode() { result = callNode }
+
+  override Location getLocation() { result = callNode.getLocation() }
 
   override string toString() { result = "Capturing closure argument" }
 }
 
-class CapturedVariablesArgumentNodeAsArgumentNode extends CapturedVariablesArgumentNode,
-  ArgumentNode
+/** A captured variables argument node viewed as an argument node. Needed because `argumentOf` is a global predicate. */
+class CapturedVariablesArgumentNodeAsArgumentNode extends ArgumentNode instanceof CapturedVariablesArgumentNode
 {
   override predicate argumentOf(DataFlowCall call, ArgumentPosition pos) {
-    callNode = call.getNode() and
+    this.(CapturedVariablesArgumentNode).getCallNode() = call.getNode() and
     pos.isLambdaSelf()
   }
+}
+
+/** A synthetic node representing the values of variables captured by a comprehension after the output has been computed. */
+class SynthCapturedVariablesArgumentPostUpdateNode extends PostUpdateNodeImpl,
+  TSynthCapturedVariablesArgumentPostUpdateNode
+{
+  ControlFlowNode callable;
+
+  SynthCapturedVariablesArgumentPostUpdateNode() {
+    this = TSynthCapturedVariablesArgumentPostUpdateNode(callable)
+  }
+
+  override string toString() { result = "[post] Capturing closure argument" }
+
+  override Scope getScope() { result = callable.getScope() }
+
+  override Location getLocation() { result = callable.getLocation() }
+
+  override Node getPreUpdateNode() { result = TSynthCapturedVariablesArgumentNode(callable) }
 }
 
 /** A synthetic node representing the values of variables captured by a comprehension. */
