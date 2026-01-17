@@ -170,8 +170,8 @@ Python built-in support
    MySQLdb, Database
    psycopg2, Database
    sqlite3, Database
-   Twisted,Web framework
-   Rsa,Cryptography library
+   Twisted, Web framework
+   Rsa, Cryptography library
    cryptography, Cryptography library
    pycryptodome, Cryptography library
    pycryptodomex, Cryptography library
